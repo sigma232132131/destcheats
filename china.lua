@@ -1,5 +1,5 @@
 -- Define a new section for the example addon
-local Example = ObeseAddons:Section({Name = "Game Utilities", Side = "left"})
+local Example = ObeseAddons:Section({Name = "SIGMA CHINA UTILITIES", Side = "left"})
 
 -- Variable to track the toggle state
 local flags = { destroy_cheaters = false }
