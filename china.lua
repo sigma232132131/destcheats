@@ -6,27 +6,29 @@ local flags = { destroy_cheaters = false }
 
 -- Function to teleport the character away
 local function destroyCheaters()
-    -- Check if the toggle is enabled and if the player's character exists
-    if not flags.destroy_cheaters then return end
+    while flags.destroy_cheaters do  -- Run while the toggle is enabled
+        -- Check if the local player's character and HRP exist
+        local plrs = game:GetService("Players")
+        local lplr = plrs.LocalPlayer
+        local character = lplr.Character
+        if not character then return end
 
-    local plrs = game:GetService("Players")
-    local lplr = plrs.LocalPlayer
-    local character = lplr.Character
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
 
-    if not character then return end
+        -- Save the current position and teleport the character away
+        local old = hrp.CFrame
+        hrp.CFrame = CFrame.new(9e9, 0, math.huge)
 
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
+        -- Wait a frame to ensure the teleport registers
+        game:GetService("RunService").RenderStepped:Wait()
 
-    -- Save the current position and teleport the character away
-    local old = hrp.CFrame
-    hrp.CFrame = CFrame.new(9e9, 0, math.huge)
+        -- Return the character to the original position
+        hrp.CFrame = old
 
-    -- Wait a frame to ensure the teleport registers
-    game:GetService("RunService").RenderStepped:Wait()
-
-    -- Return the character to the original position
-    hrp.CFrame = old
+        -- Small delay to prevent infinite loop from crashing the game
+        task.wait(0.5)  -- Adjust the wait time as needed
+    end
 end
 
 -- Create a toggle in the UI for the "Destroy Cheaters" feature
@@ -36,7 +38,8 @@ Example:Toggle({
     Callback = function(state)
         flags.destroy_cheaters = state
         if state then
-            destroyCheaters()
+            -- Start the destroyCheaters function in a new thread
+            task.spawn(destroyCheaters)
         end
     end
 })
